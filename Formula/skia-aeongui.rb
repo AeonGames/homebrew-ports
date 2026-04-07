@@ -29,6 +29,11 @@ class SkiaAeongui < Formula
       url "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/ninja/mac-arm64/+/version:2@1.12.1.chromium.4"
       sha256 "c5e9b4ffab3b2edefbc41849fc81f116c8d047b258906becc061be9ecaf04afd"
     end
+
+    resource "vulkan-memory-allocator-header" do
+      url "https://raw.githubusercontent.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/a6bfc237255a6bac1513f7c1ebde6d8aed6b5191/include/vk_mem_alloc.h"
+      sha256 "087975b663fb5e5c0fd0ff9aac7f9fd5a0fada72f8d1f65b6bd8fcfd3a388359"
+    end
   end
 
   on_intel do
@@ -40,6 +45,11 @@ class SkiaAeongui < Formula
     resource "ninja" do
       url "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/ninja/mac-amd64/+/version:2@1.12.1.chromium.4"
       sha256 "9866e69dc0d1efccac019697213b5ab2e0332dcc629682f13733e0792ea95119"
+    end
+
+    resource "vulkan-memory-allocator-header" do
+      url "https://raw.githubusercontent.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/a6bfc237255a6bac1513f7c1ebde6d8aed6b5191/include/vk_mem_alloc.h"
+      sha256 "087975b663fb5e5c0fd0ff9aac7f9fd5a0fada72f8d1f65b6bd8fcfd3a388359"
     end
   end
 
@@ -101,6 +111,7 @@ class SkiaAeongui < Formula
     # resources downloaded during the fetch phase, then run the build offline.
     (buildpath/"bin").mkpath
     (buildpath/"third_party/ninja").mkpath
+    (buildpath/"third_party/externals/vulkanmemoryallocator/include").mkpath
 
     resource("gn").stage do
       cp "gn", buildpath/"bin/gn"
@@ -108,6 +119,10 @@ class SkiaAeongui < Formula
 
     resource("ninja").stage do
       cp "ninja", buildpath/"third_party/ninja/ninja"
+    end
+
+    resource("vulkan-memory-allocator-header").stage do
+      cp "vk_mem_alloc.h", buildpath/"third_party/externals/vulkanmemoryallocator/include/vk_mem_alloc.h"
     end
 
     chmod 0755, buildpath/"bin/gn"
