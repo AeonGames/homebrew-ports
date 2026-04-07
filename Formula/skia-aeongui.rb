@@ -84,6 +84,7 @@ class SkiaAeongui < Formula
       "skia_use_dng_sdk=false",
       "skia_use_perfetto=false",
       "skia_use_piex=false",
+      "skia_use_wuffs=false",
       "skia_use_system_expat=true",
       "skia_use_system_freetype2=true",
       "skia_use_system_harfbuzz=true",
