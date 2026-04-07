@@ -68,7 +68,9 @@ class SkiaAeongui < Formula
       "extra_ldflags=#{gn_list.call(extra_ldflags)}"
     ].join(" ")
 
-    system Formula["python@3.12"].opt_bin/"python3", "tools/git-sync-deps"
+    # Avoid full DEPS sync in Homebrew builds; some Chromium mirrors can be inaccessible.
+    # For this pinned/system-libs configuration we only need GN (and optionally Ninja).
+    system Formula["python@3.12"].opt_bin/"python3", "bin/fetch-gn"
     system Formula["python@3.12"].opt_bin/"python3", "bin/fetch-ninja"
     system "bin/gn", "gen", "out/Static", "--args=#{gn_args}"
     system "ninja", "-C", "out/Static", "skia"
