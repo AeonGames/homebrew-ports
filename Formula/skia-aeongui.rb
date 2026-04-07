@@ -19,6 +19,30 @@ class SkiaAeongui < Formula
   depends_on "vulkan-loader"
   depends_on "webp"
 
+  on_arm do
+    resource "gn" do
+      url "https://chrome-infra-packages.appspot.com/dl/gn/gn/mac-arm64/+/git_revision:b2afae122eeb6ce09c52d63f67dc53fc517dbdc8"
+      sha256 "cbb260f2cf999f7d74da96b3828a061299c6337354dd6db642e778828576025c"
+    end
+
+    resource "ninja" do
+      url "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/ninja/mac-arm64/+/version:2@1.12.1.chromium.4"
+      sha256 "c5e9b4ffab3b2edefbc41849fc81f116c8d047b258906becc061be9ecaf04afd"
+    end
+  end
+
+  on_intel do
+    resource "gn" do
+      url "https://chrome-infra-packages.appspot.com/dl/gn/gn/mac-amd64/+/git_revision:b2afae122eeb6ce09c52d63f67dc53fc517dbdc8"
+      sha256 "4bea817159f060980f1ca1d0400ef6cd2e0ab0ade66bb34e91aab9c2cffc9d83"
+    end
+
+    resource "ninja" do
+      url "https://chrome-infra-packages.appspot.com/dl/infra/3pp/tools/ninja/mac-amd64/+/version:2@1.12.1.chromium.4"
+      sha256 "9866e69dc0d1efccac019697213b5ab2e0332dcc629682f13733e0792ea95119"
+    end
+  end
+
   def install
     target_cpu = Hardware::CPU.arm? ? "arm64" : "x64"
 
@@ -68,12 +92,24 @@ class SkiaAeongui < Formula
       "extra_ldflags=#{gn_list.call(extra_ldflags)}"
     ].join(" ")
 
-    # Avoid full DEPS sync in Homebrew builds; some Chromium mirrors can be inaccessible.
-    # For this pinned/system-libs configuration we only need GN (and optionally Ninja).
-    system Formula["python@3.12"].opt_bin/"python3", "bin/fetch-gn"
-    system Formula["python@3.12"].opt_bin/"python3", "bin/fetch-ninja"
+    # Homebrew builds run in a network-restricted sandbox. Stage GN/Ninja from
+    # resources downloaded during the fetch phase, then run the build offline.
+    (buildpath/"bin").mkpath
+    (buildpath/"third_party/ninja").mkpath
+
+    resource("gn").stage do
+      cp "gn", buildpath/"bin/gn"
+    end
+
+    resource("ninja").stage do
+      cp "ninja", buildpath/"third_party/ninja/ninja"
+    end
+
+    chmod 0755, buildpath/"bin/gn"
+    chmod 0755, buildpath/"third_party/ninja/ninja"
+
     system "bin/gn", "gen", "out/Static", "--args=#{gn_args}"
-    system "ninja", "-C", "out/Static", "skia"
+    system "third_party/ninja/ninja", "-C", "out/Static", "skia"
 
     lib.install "out/Static/libskia.a"
     include.install Dir["include/*"]
