@@ -158,15 +158,16 @@ class SkiaAeongui < Formula
     <<~EOS
       This formula is pinned to Skia stable chrome/m147.
 
-      Example usage from this repository:
-        ./tools/homebrew/install-skia-via-local-tap.sh
+      Install from the published tap:
+        brew tap aeongames/ports
+        brew install --build-from-source aeongames/ports/skia-aeongui
 
       Manual local tap workflow:
-        brew tap aeongui/ports file://$PWD/tools/homebrew/homebrew-ports
-        brew install --build-from-source aeongui/ports/skia-aeongui
+        brew tap aeongui/ports-local file://$PWD
+        brew install --build-from-source aeongui/ports-local/skia-aeongui
 
       If you want tip-of-tree instead:
-        brew reinstall --HEAD --build-from-source aeongui/ports/skia-aeongui
+        brew reinstall --HEAD --build-from-source aeongames/ports/skia-aeongui
 
       After install, point your build to:
         SKIA_ROOT=#{opt_prefix}
