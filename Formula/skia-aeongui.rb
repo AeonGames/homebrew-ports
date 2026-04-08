@@ -133,6 +133,8 @@ class SkiaAeongui < Formula
 
     lib.install "out/Static/libskia.a"
     include.install Dir["include/*"]
+    (include/"modules").mkpath
+    cp_r "modules/skcms", include/"modules/skcms"
 
     (lib/"pkgconfig").mkpath
     (lib/"pkgconfig"/"skia.pc").write <<~EOS
@@ -145,13 +147,14 @@ class SkiaAeongui < Formula
       Description: Skia 2D graphics library
       Version: #{version}
       Libs: -L${libdir} -lskia
-      Cflags: -I${includedir}
+      Cflags: -I${prefix} -I${includedir}
     EOS
   end
 
   test do
     assert_predicate lib/"libskia.a", :exist?
     assert_predicate include/"core/SkCanvas.h", :exist?
+    assert_predicate include/"modules/skcms/skcms.h", :exist?
   end
 
   def caveats
